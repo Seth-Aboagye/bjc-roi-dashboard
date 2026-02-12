@@ -7,11 +7,10 @@ from core.metrics import compute_kpis, compute_rollups
 from core.charts import line_trend, bar_compare, waterfall_net, donor_mix_pie
 from core.reports_excel import build_excel_report
 from core.reports_word import build_word_report
-from core.reports_pptx import build_pptx_report
 
 st.set_page_config(page_title="BJC Fundraising ROI Dashboard", layout="wide")
 st.title("BJC Fundraising ROI Dashboard (CSV Upload)")
-st.caption("Upload EveryAction donation exports + a simple fundraising cost file to compute ROI and generate reports.")
+st.caption("Upload donation exports + a simple fundraising cost file to compute ROI and generate reports (Excel/Word).")
 
 # -----------------------------
 # Sidebar uploads
@@ -133,10 +132,10 @@ with tab4:
     st.plotly_chart(donor_mix_pie(d), use_container_width=True)
 
 # -----------------------------
-# Report generation
+# Report generation (Excel + Word only)
 # -----------------------------
 st.markdown("---")
-st.subheader("Generate Reports")
+st.subheader("Generate Reports (Excel + Word)")
 
 report_title = st.text_input("Report title", value="BJC Fundraising ROI Report")
 notes = st.text_area("Interpretation / Notes (optional)", value="")
@@ -154,7 +153,7 @@ payload = {
     "kpis": kpis,
 }
 
-colx, colw, colp = st.columns(3)
+colx, colw = st.columns(2)
 
 with colx:
     xlsx_bytes = build_excel_report(d, c, payload)
@@ -172,15 +171,6 @@ with colw:
         data=docx_bytes,
         file_name="bjc_roi_report.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    )
-
-with colp:
-    pptx_bytes = build_pptx_report(d, c, payload, notes=notes)
-    st.download_button(
-        "Download PowerPoint deck",
-        data=pptx_bytes,
-        file_name="bjc_roi_report.pptx",
-        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
     )
 
 st.markdown("---")
